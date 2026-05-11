@@ -1,0 +1,17 @@
+[
+  {
+    "id": "1",
+    "src": "/videos/v1.mp4",
+    "type": "local"
+  },
+  {
+    "id": "2",
+    "src": "/videos/v2.mp4",
+    "type": "local"
+  },
+  {
+    "id": "3",
+    "src": "/videos/v3.mp4",
+    "type": "local"
+  }
+]
