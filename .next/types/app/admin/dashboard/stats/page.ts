@@ -1,8 +1,8 @@
-// File: C:\Users\k.varshitha\Desktop\vedyx - Copy\Scratch\app\contact\page.jsx
-import * as entry from '../../../../app/contact/page.js'
+// File: C:\Users\k.varshitha\Desktop\vedyx - Copy\Scratch\app\admin\dashboard\stats\page.jsx
+import * as entry from '../../../../../../app/admin/dashboard/stats/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
-type TEntry = typeof import('../../../../app/contact/page.js')
+type TEntry = typeof import('../../../../../../app/admin/dashboard/stats/page.js')
 
 // Check that the entry is a valid entry
 checkFields<Diff<{

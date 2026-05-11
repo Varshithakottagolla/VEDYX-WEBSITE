@@ -31,30 +31,20 @@
       "static/chunks/main-app.js",
       "static/chunks/app/admin/dashboard/layout.js"
     ],
-    "/admin/dashboard/inquiries/page": [
+    "/admin/dashboard/blogs/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/admin/dashboard/inquiries/page.js"
-    ],
-    "/admin/dashboard/videos/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/admin/dashboard/videos/page.js"
+      "static/chunks/app/admin/dashboard/blogs/page.js"
     ],
     "/admin/dashboard/services/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/admin/dashboard/services/page.js"
     ],
-    "/admin/dashboard/blogs/page": [
+    "/admin/dashboard/inquiries/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/admin/dashboard/blogs/page.js"
-    ],
-    "/admin/dashboard/about/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/admin/dashboard/about/page.js"
+      "static/chunks/app/admin/dashboard/inquiries/page.js"
     ],
     "/admin/dashboard/hero/page": [
       "static/chunks/webpack.js",
@@ -66,10 +56,30 @@
       "static/chunks/main-app.js",
       "static/chunks/app/admin/dashboard/portfolio/page.js"
     ],
-    "/contact/page": [
+    "/admin/dashboard/videos/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/contact/page.js"
+      "static/chunks/app/admin/dashboard/videos/page.js"
+    ],
+    "/admin/dashboard/stats/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/admin/dashboard/stats/page.js"
+    ],
+    "/admin/dashboard/about/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/admin/dashboard/about/page.js"
+    ],
+    "/services/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/services/page.js"
+    ],
+    "/blog/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/blog/page.js"
     ]
   }
 }
