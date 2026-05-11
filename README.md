@@ -1,4 +1,4 @@
-# Your Brand (Beqick Clone)
+# Your Brand 
 
 This is a complete, clean-code Next.js rewrite of the original website template, using standard React components, Tailwind CSS, and Framer Motion for premium animations. All original branding, logos, and assets have been replaced with neutral, easy-to-edit placeholders.
 
