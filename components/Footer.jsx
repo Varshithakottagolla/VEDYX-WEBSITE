@@ -51,8 +51,12 @@ export default function Footer() {
 
   useEffect(() => {
     fetch("/api/admin/data?section=social_links")
-      .then((r) => r.ok ? r.json() : null)
-      .then((data) => { if (data) setLinks(data); })
+      .then((r) => r.json())
+      .then((data) => { 
+        if (data && !data.error && Object.keys(data).length > 0) {
+          setLinks(data); 
+        }
+      })
       .catch(() => {});
   }, []);
 
