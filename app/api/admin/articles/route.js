@@ -1,24 +1,10 @@
-import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import fs from "fs";
 import path from "path";
 
-// Helper to check if Supabase is configured
-const isSupabaseConfigured = !!process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL !== 'your_supabase_url_here';
-
 const ARTICLES_PATH = path.join(process.cwd(), "lib", "articles.js");
 
-function readArticlesLocal() {
-  if (!fs.existsSync(ARTICLES_PATH)) return [];
-  const content = fs.readFileSync(ARTICLES_PATH, "utf-8");
-  const match = content.match(/export const articles = (\[[\s\S]*\]);/);
-  if (!match) return [];
-  try {
-    return JSON.parse(match[1].replace(/'/g, '"').replace(/(\w+):/g, '"$1":')); // Crude conversion for eval-less parsing
-  } catch {
-    return [];
-  }
-}
+// ... local helpers ...
 
 // GET /api/admin/articles
 export async function GET() {
@@ -28,15 +14,11 @@ export async function GET() {
       .select('*')
       .order('created_at', { ascending: false });
 
-    // If we have data in Supabase, use it
     if (!error && data && data.length > 0) {
       return NextResponse.json(data);
     }
   }
-
-  // Fallback to local if Supabase is empty or not configured
-  const articles = readArticlesLocal();
-  return NextResponse.json(articles);
+  return NextResponse.json([]);
 }
 
 // POST /api/admin/articles
@@ -44,16 +26,27 @@ export async function POST(request) {
   const body = await request.json();
 
   if (isSupabaseConfigured) {
+    // Normalize keys for Supabase
+    const normalizedBody = {
+      title: body.title,
+      slug: body.slug,
+      date: body.date || new Date().toLocaleDateString(),
+      author: body.author || "Admin",
+      read_time: body.read_time || body.readTime || "5 min read",
+      image: body.image || "/images/placeholder.jpg",
+      content: body.content || []
+    };
+
     const { data, error } = await supabase
       .from('articles')
-      .insert([body])
+      .insert([normalizedBody])
       .select();
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     return NextResponse.json({ success: true, article: data[0] });
   }
 
-  return NextResponse.json({ error: "Supabase not configured for writes" }, { status: 500 });
+  return NextResponse.json({ error: "Supabase not configured" }, { status: 500 });
 }
 
 // PUT /api/admin/articles
@@ -62,16 +55,23 @@ export async function PUT(request) {
   const { slug, ...updates } = body;
 
   if (isSupabaseConfigured) {
+    // Normalize updates for Supabase
+    const normalizedUpdates = { ...updates };
+    if (updates.readTime) {
+      normalizedUpdates.read_time = updates.readTime;
+      delete normalizedUpdates.readTime;
+    }
+
     const { error } = await supabase
       .from('articles')
-      .update(updates)
+      .update(normalizedUpdates)
       .eq('slug', slug);
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     return NextResponse.json({ success: true });
   }
 
-  return NextResponse.json({ error: "Supabase not configured for updates" }, { status: 500 });
+  return NextResponse.json({ error: "Supabase not configured" }, { status: 500 });
 }
 
 // DELETE /api/admin/articles?slug=xxx
@@ -89,5 +89,5 @@ export async function DELETE(request) {
     return NextResponse.json({ success: true });
   }
 
-  return NextResponse.json({ error: "Supabase not configured for deletes" }, { status: 500 });
+  return NextResponse.json({ error: "Supabase not configured" }, { status: 500 });
 }

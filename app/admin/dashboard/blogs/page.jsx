@@ -29,7 +29,7 @@ export default function BlogsAdmin() {
       slug: "",
       date: new Date().toLocaleDateString("en-US", { month: "long", day: "2-digit", year: "numeric" }),
       author: "Manoj Pradeep",
-      readTime: "5 min read",
+      read_time: "5 min read",
       image: "",
       content: [{ type: "p", text: "" }],
     });
@@ -166,7 +166,7 @@ export default function BlogsAdmin() {
               )}
               <div className="flex-1 min-w-0">
                 <p className="text-white font-semibold text-sm truncate">{article.title}</p>
-                <p className="text-gray-500 text-xs mt-0.5">{article.date} · {article.readTime}</p>
+                <p className="text-gray-500 text-xs mt-0.5">{article.date} · {article.read_time || article.readTime}</p>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
                 <button
@@ -250,8 +250,8 @@ export default function BlogsAdmin() {
               <div>
                 <label className={labelClass}>Read Time</label>
                 <input
-                  value={editing.readTime}
-                  onChange={(e) => setEditing((ed) => ({ ...ed, readTime: e.target.value }))}
+                  value={editing.read_time || editing.readTime || ""}
+                  onChange={(e) => setEditing((ed) => ({ ...ed, read_time: e.target.value }))}
                   className={inputClass}
                 />
               </div>
