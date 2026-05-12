@@ -1,14 +1,23 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { articles } from "@/lib/articles";
+import { articles as staticArticles } from "@/lib/articles";
 
 export default function BlogSection() {
+  const [articles, setArticles] = useState([]);
+
+  useEffect(() => {
+    // We only use staticArticles here as requested, 
+    // so new cloud-only blogs won't show up on the Home Page.
+    setArticles(staticArticles);
+  }, []);
+
   return (
     <section id="blog" className="py-24 bg-black text-white flex flex-col items-center">
       <div className="container mx-auto px-6 max-w-5xl flex flex-col items-center">
-        
+
         {/* Header Section */}
         <div className="flex flex-col items-center mb-16">
           <div className="flex items-center space-x-2 bg-white/10 px-4 py-2 rounded-full mb-6 border border-white/10">
@@ -41,7 +50,7 @@ export default function BlogSection() {
                   <h3 className="text-lg md:text-xl font-bold mb-2 leading-snug group-hover:text-gray-300 transition-colors">
                     {article.title}
                   </h3>
-                  
+
                   <div className="text-sm text-gray-400 flex flex-col">
                     <span className="mb-1">{article.date}</span>
                     <span>{article.author}</span>
