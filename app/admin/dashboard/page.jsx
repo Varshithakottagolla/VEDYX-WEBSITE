@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   Sparkles, Info, BarChart2, Video, Image,
   FileText, Mail, Wrench, TrendingUp, ArrowRight,
-  RefreshCw, Cloud
+  RefreshCw, Cloud, AlertCircle
 } from "lucide-react";
 
 const sections = [
@@ -24,6 +24,7 @@ export default function DashboardOverview() {
   const [counts, setCounts] = useState({ blogs: 0, inquiries: 0, videos: 0 });
   const [syncing, setSyncing] = useState(false);
   const [syncStatus, setSyncStatus] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const fetchData = () => {
     Promise.all([
@@ -47,19 +48,24 @@ export default function DashboardOverview() {
     if (!confirm("This will migrate your local articles and social links to the cloud (Supabase). Continue?")) return;
     
     setSyncing(true);
+    setErrorMessage("");
     try {
       const res = await fetch("/api/admin/sync", { method: "POST" });
+      const data = await res.json();
+      
       if (res.ok) {
         setSyncStatus("success");
         fetchData();
       } else {
         setSyncStatus("error");
+        setErrorMessage(data.error || "Unknown error occurred during sync");
       }
-    } catch {
+    } catch (err) {
       setSyncStatus("error");
+      setErrorMessage(err.message || "Network error occurred");
     }
     setSyncing(false);
-    setTimeout(() => setSyncStatus(null), 3000);
+    setTimeout(() => { if (syncStatus === 'success') setSyncStatus(null); }, 5000);
   };
 
   return (
@@ -74,15 +80,24 @@ export default function DashboardOverview() {
         </div>
         
         {/* Sync Button */}
-        <button
-          onClick={handleSync}
-          disabled={syncing}
-          className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-xl text-sm font-medium transition-all group"
-        >
-          <RefreshCw size={16} className={`text-blue-400 ${syncing ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
-          {syncing ? 'Syncing to Cloud...' : 'Sync to Cloud'}
-          {syncStatus === 'success' && <span className="text-green-400 ml-2">✓ Done</span>}
-        </button>
+        <div className="flex flex-col items-end gap-2">
+          <button
+            onClick={handleSync}
+            disabled={syncing}
+            className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-xl text-sm font-medium transition-all group"
+          >
+            <RefreshCw size={16} className={`text-blue-400 ${syncing ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
+            {syncing ? 'Syncing to Cloud...' : 'Sync to Cloud'}
+            {syncStatus === 'success' && <span className="text-green-400 ml-2">✓ Success</span>}
+          </button>
+          
+          {syncStatus === 'error' && (
+            <div className="flex items-center gap-2 text-red-400 text-xs bg-red-500/10 border border-red-500/20 px-3 py-1.5 rounded-lg animate-pulse">
+              <AlertCircle size={14} />
+              {errorMessage}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Quick stats */}
