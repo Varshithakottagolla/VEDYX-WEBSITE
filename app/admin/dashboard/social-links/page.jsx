@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import {
-  Instagram, Linkedin, Youtube, Facebook, Send, Twitter, Save, CheckCircle, AlertCircle, Share2
+  Instagram, Linkedin, Youtube, Facebook, Send, Twitter, Save, CheckCircle, AlertCircle, Share2, MessageCircle
 } from "lucide-react";
 
 // Pinterest SVG (not in lucide)
@@ -22,6 +22,7 @@ const fields = [
   { key: "telegram",   label: "Telegram",   icon: Send,           placeholder: "https://t.me/yourchannel",                color: "text-sky-400"  },
   { key: "pinterest",  label: "Pinterest",  icon: PinterestIcon,  placeholder: "https://www.pinterest.com/yourprofile",   color: "text-rose-400" },
   { key: "twitter",    label: "Twitter / X",icon: Twitter,        placeholder: "https://twitter.com/yourhandle",          color: "text-gray-300" },
+  { key: "whatsapp",   label: "WhatsApp",   icon: MessageCircle,  placeholder: "https://wa.me/91...",                    color: "text-green-400" },
 ];
 
 const defaultLinks = {
@@ -32,6 +33,7 @@ const defaultLinks = {
   telegram:  "https://t.me/MANASchool1",
   pinterest: "https://www.pinterest.com/dummy-vedyx",
   twitter:   "https://twitter.com/dummy-vedyx",
+  whatsapp:  "https://wa.me/916364926959",
 };
 
 export default function SocialLinksAdmin() {

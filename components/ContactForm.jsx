@@ -61,7 +61,9 @@ export default function ContactForm() {
               </div>
               <div>
                 <h4 className="font-semibold text-lg">Call Us</h4>
-                <p className="text-gray-400">+91 70130 50719</p>
+                <a href="tel:+916364926959" className="text-gray-400 hover:text-primary transition-colors">
+                  +91 63649 26959
+                </a>
               </div>
             </div>
           </motion.div>

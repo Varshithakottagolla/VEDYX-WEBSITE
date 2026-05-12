@@ -9,6 +9,7 @@ import {
   Facebook,
   Send,
   Twitter,
+  MessageCircle,
 } from "lucide-react";
 
 // Pinterest doesn't exist in lucide-react, so we use a simple SVG inline
@@ -44,6 +45,7 @@ const socialConfig = [
   { key: "telegram",  icon: Send,      label: "Telegram"  },
   { key: "pinterest", icon: PinterestIcon, label: "Pinterest" },
   { key: "twitter",   icon: Twitter,   label: "Twitter"   },
+  { key: "whatsapp",  icon: MessageCircle, label: "WhatsApp" },
 ];
 
 export default function Footer() {

@@ -13,7 +13,7 @@ This is a complete, clean-code Next.js rewrite of the original website template,
 ## How to Customize
 
 1. **Brand Name**: Search globally for `Your Brand` or `YOUR BRAND` to replace the text with your actual brand name.
-2. **Contact Details**: Update the phone numbers (`+91 90000 00000`) and emails (`service@yourbrand.com`) in `ContactForm.jsx` and `Footer.jsx`.
+2. **Contact Details**: Update the phone numbers (`+91 63649 26959`) and emails (`service@yourbrand.com`) in `ContactForm.jsx` and `Footer.jsx`.
 3. **Hero Video**: Add a video to `/public/videos/hero-bg.mp4` and uncomment the `<source>` tag in `components/Hero.jsx`.
 4. **Portfolio Videos**: Add your reel videos to `/public/videos/work-1.mp4` etc. and uncomment the `<video>` tag in `components/PortfolioCarousel.jsx`.
 5. **Blog Images**: Add images to `/public/images/blog-1.jpg` and uncomment the `<img src=...>` tags in `components/BlogSection.jsx`.

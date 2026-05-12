@@ -541,9 +541,6 @@ video {
 .pointer-events-auto {
   pointer-events: auto;
 }
-.collapse {
-  visibility: collapse;
-}
 .static {
   position: static;
 }
@@ -729,9 +726,6 @@ video {
 .inline-flex {
   display: inline-flex;
 }
-.table {
-  display: table;
-}
 .grid {
   display: grid;
 }
@@ -902,9 +896,6 @@ video {
 }
 .flex-grow {
   flex-grow: 1;
-}
-.border-collapse {
-  border-collapse: collapse;
 }
 .origin-center {
   transform-origin: center;

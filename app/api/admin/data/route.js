@@ -1,12 +1,9 @@
 import { NextResponse } from "next/server";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import path from "path";
 import fs from "fs";
-import { supabase } from "@/lib/supabase";
 
 const DATA_DIR = path.join(process.cwd(), "lib", "data");
-
-// Helper to check if Supabase is configured
-const isSupabaseConfigured = !!process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL !== 'your_supabase_url_here';
 
 function readJsonLocal(file) {
   const filePath = path.join(DATA_DIR, file);
@@ -14,17 +11,12 @@ function readJsonLocal(file) {
   return JSON.parse(fs.readFileSync(filePath, "utf-8"));
 }
 
-function writeJsonLocal(file, data) {
-  const filePath = path.join(DATA_DIR, file);
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf-8");
-}
-
 // GET /api/admin/data?section=hero
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const section = searchParams.get("section");
 
-  const validSections = ["hero", "about", "stats", "videos", "portfolio", "contacts", "process", "social_links"];
+  const validSections = ["hero", "about", "stats", "videos", "portfolio", "contacts", "process", "social_links", "services"];
   if (!section || !validSections.includes(section)) {
     return NextResponse.json({ error: "Invalid section" }, { status: 400 });
   }
@@ -35,11 +27,11 @@ export async function GET(request) {
       .from('site_content')
       .select('data')
       .eq('section', section)
-      .single();
+      .maybeSingle();
 
     if (!error && data) return NextResponse.json(data.data);
-    
-    // If not in Supabase yet, fallback to local JSON but warn
+
+    // If not in Supabase yet, fallback to local JSON
     const localData = readJsonLocal(`${section}.json`);
     return NextResponse.json(localData || { error: "Not found" }, { status: localData ? 200 : 404 });
   }
@@ -56,7 +48,7 @@ export async function POST(request) {
   const { searchParams } = new URL(request.url);
   const section = searchParams.get("section");
 
-  const validSections = ["hero", "about", "stats", "videos", "portfolio", "contacts", "process", "social_links"];
+  const validSections = ["hero", "about", "stats", "videos", "portfolio", "contacts", "process", "social_links", "services"];
   if (!section || !validSections.includes(section)) {
     return NextResponse.json({ error: "Invalid section" }, { status: 400 });
   }
@@ -67,7 +59,7 @@ export async function POST(request) {
   if (isSupabaseConfigured) {
     const { error } = await supabase
       .from('site_content')
-      .upsert({ section, data: body });
+      .upsert({ section, data: body }, { onConflict: 'section' });
 
     if (error) {
       console.error('Supabase save error:', error);
@@ -76,7 +68,5 @@ export async function POST(request) {
     return NextResponse.json({ success: true, provider: 'supabase' });
   }
 
-  // Local fallback
-  writeJsonLocal(`${section}.json`, body);
-  return NextResponse.json({ success: true, provider: 'local' });
+  return NextResponse.json({ error: "Supabase not configured" }, { status: 500 });
 }
