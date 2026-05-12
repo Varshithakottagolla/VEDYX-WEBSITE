@@ -257,15 +257,15 @@ export default function BlogsAdmin() {
               </div>
             </div>
 
-            {/* Cover image */}
+            {/* Cover Image */}
             <div>
-              <label className={labelClass}>Cover Image</label>
+              <label className={labelClass}>Cover Image (URL or Upload)</label>
               <div className="flex gap-2 mb-2">
                 <input
-                  value={editing.image}
+                  value={editing.image || ""}
                   onChange={(e) => setEditing((ed) => ({ ...ed, image: e.target.value }))}
                   className={inputClass + " flex-1"}
-                  placeholder="/images/blogs/image.jpg"
+                  placeholder="https://example.com/image.jpg"
                 />
                 <input ref={fileRef} type="file" accept="image/*" onChange={uploadImage} className="hidden" />
                 <button
@@ -277,12 +277,16 @@ export default function BlogsAdmin() {
                   {uploading ? "..." : "Upload"}
                 </button>
               </div>
+              <p className="text-[10px] text-gray-500 mb-2">Tip: You can paste any image link from the internet above!</p>
               {editing.image && (
-                <img
-                  src={editing.image}
-                  alt=""
-                  className="w-full h-32 object-cover rounded-xl border border-white/10"
-                />
+                <div className="relative group">
+                  <img
+                    src={editing.image}
+                    alt="Preview"
+                    className="w-full h-32 object-cover rounded-xl border border-white/10"
+                    onError={(e) => { e.target.src = "https://via.placeholder.com/800x400?text=Invalid+Image+URL"; }}
+                  />
+                </div>
               )}
             </div>
 
