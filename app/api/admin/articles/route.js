@@ -28,10 +28,13 @@ export async function GET() {
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (!error) return NextResponse.json(data);
+    // If we have data in Supabase, use it
+    if (!error && data && data.length > 0) {
+      return NextResponse.json(data);
+    }
   }
 
-  // Fallback to local
+  // Fallback to local if Supabase is empty or not configured
   const articles = readArticlesLocal();
   return NextResponse.json(articles);
 }
