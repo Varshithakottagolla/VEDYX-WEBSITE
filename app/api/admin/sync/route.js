@@ -16,13 +16,21 @@ export async function POST() {
       .from("articles")
       .upsert(
         articles.map(a => ({
-          ...a,
-          content: a.content // This is already a JSON array
+          title: a.title,
+          slug: a.slug,
+          date: a.date,
+          author: a.author,
+          read_time: a.read_time,
+          image: a.image,
+          content: a.content
         })),
         { onConflict: 'slug' }
       );
 
-    if (articlesError) throw articlesError;
+    if (articlesError) {
+      console.error("Sync Error Details:", articlesError);
+      throw articlesError;
+    }
 
     // 2. Sync Social Links
     const socialPath = path.join(process.cwd(), "lib", "data", "social_links.json");
