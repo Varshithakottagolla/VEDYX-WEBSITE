@@ -3,10 +3,26 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { BookOpen } from "lucide-react";
-
-import { articles } from "@/lib/articles";
+import { useEffect, useState } from "react";
+import { articles as staticArticles } from "@/lib/articles";
 
 export default function BlogPage() {
+  const [articles, setArticles] = useState(staticArticles);
+
+  useEffect(() => {
+    fetch("/api/admin/articles")
+      .then((r) => r.json())
+      .then((d) => {
+        if (Array.isArray(d)) {
+          // Merge dynamic articles with static ones, avoiding duplicates by slug
+          const dynamicSlugs = new Set(d.map(a => a.slug));
+          const filteredStatic = staticArticles.filter(a => !dynamicSlugs.has(a.slug));
+          setArticles([...d, ...filteredStatic]);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <div className="bg-black min-h-screen pt-32 pb-24 text-white">
       <div className="container mx-auto px-6 max-w-4xl flex flex-col items-center">

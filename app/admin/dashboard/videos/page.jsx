@@ -59,6 +59,24 @@ export default function VideosAdmin() {
     setUploading(false);
   };
 
+  const getEmbedUrl = (url) => {
+    if (!url) return "";
+    if (url.endsWith('.mp4') || url.endsWith('.webm') || url.endsWith('.mov')) return { type: 'direct', url };
+    if (url.includes('youtube.com/shorts/')) {
+      const id = url.split('/shorts/')[1]?.split('?')[0];
+      return { type: 'embed', url: `https://www.youtube.com/embed/${id}` };
+    }
+    if (url.includes('youtube.com/watch?v=') || url.includes('youtu.be/')) {
+      const id = url.includes('watch?v=') ? url.split('v=')[1]?.split('&')[0] : url.split('be/')[1]?.split('?')[0];
+      return { type: 'embed', url: `https://www.youtube.com/embed/${id}` };
+    }
+    if (url.includes('instagram.com/reel/') || url.includes('instagram.com/reels/')) {
+      const id = url.split('/reel/')[1]?.split('/')[0] || url.split('/reels/')[1]?.split('/')[0];
+      return { type: 'embed', url: `https://www.instagram.com/reel/${id}/embed` };
+    }
+    return { type: 'direct', url };
+  };
+
   if (!videos) return <LoadingState />;
 
   return (
@@ -97,7 +115,7 @@ export default function VideosAdmin() {
             <input
               value={newUrl}
               onChange={(e) => setNewUrl(e.target.value)}
-              placeholder="https://example.com/video.mp4"
+              placeholder="Paste YouTube, Instagram, or direct video URL"
               className={inputClass + " flex-1"}
             />
             <button
@@ -130,30 +148,47 @@ export default function VideosAdmin() {
 
       {/* Video list */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        {videos.map((vid) => (
-          <div
-            key={vid.id}
-            className="bg-[#111] border border-white/5 rounded-2xl overflow-hidden group relative"
-          >
-            <video
-              src={vid.src}
-              className="w-full aspect-[9/16] object-cover"
-              muted
-              autoPlay
-              loop
-              playsInline
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all flex flex-col justify-end p-3">
-              <p className="text-white text-xs truncate mb-2">{vid.src.split("/").pop()}</p>
-              <button
-                onClick={() => removeVideo(vid.id)}
-                className="flex items-center gap-1.5 text-xs text-red-400 bg-red-500/20 hover:bg-red-500/30 px-3 py-1.5 rounded-lg transition-all w-full justify-center"
-              >
-                <Trash2 size={12} /> Remove
-              </button>
+        {videos.map((vid, idx) => {
+          const media = getEmbedUrl(vid.src);
+          return (
+            <div
+              key={vid.id || idx}
+              className="bg-[#111] border border-white/5 rounded-2xl overflow-hidden group relative"
+            >
+              <div className="w-full aspect-[9/16] bg-black/50 flex items-center justify-center relative">
+                {media.type === 'direct' ? (
+                  <video
+                    src={media.url}
+                    className="w-full h-full object-cover"
+                    muted
+                    autoPlay
+                    loop
+                    playsInline
+                  />
+                ) : (
+                  <iframe
+                    src={media.url}
+                    className="absolute inset-0 w-full h-full border-none overflow-hidden"
+                    title="Video Preview"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    style={{ height: '100%', width: '100%' }}
+                  />
+                )}
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all flex flex-col justify-end p-3 pointer-events-none">
+                <div className="pointer-events-auto w-full">
+                  <p className="text-white text-[10px] truncate mb-2 opacity-60">{vid.src}</p>
+                  <button
+                    onClick={() => removeVideo(vid.id)}
+                    className="flex items-center gap-1.5 text-xs text-red-400 bg-red-500/20 hover:bg-red-500/30 px-3 py-1.5 rounded-lg transition-all w-full justify-center border border-red-500/20"
+                  >
+                    <Trash2 size={12} /> Remove
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="flex items-center gap-4">

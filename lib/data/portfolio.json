@@ -1,6 +1,22 @@
 [
-  { "id": "1", "src": "/images/work/w1.png" },
-  { "id": "2", "src": "/images/work/w2.png" },
-  { "id": "3", "src": "/images/work/w3.png" },
-  { "id": "4", "src": "/images/work/w4.png" }
+  {
+    "id": "1",
+    "src": "/images/work/w1.png"
+  },
+  {
+    "id": "2",
+    "src": "/images/work/w2.png"
+  },
+  {
+    "id": "3",
+    "src": "/images/work/w3.png"
+  },
+  {
+    "id": "4",
+    "src": "/images/work/w4.png"
+  },
+  {
+    "id": "1778494035013",
+    "src": "/images/work/1778494035002_vedyx_logo-03_2__1_.png"
+  }
 ]

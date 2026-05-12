@@ -1,14 +1,54 @@
-import { notFound } from "next/navigation";
-import { articles } from "@/lib/articles";
-import { ArrowLeft, Clock, User, Calendar } from "lucide-react";
-import Link from "next/link";
+"use client";
 
-export default function BlogPost({ params }) {
-  const { slug } = params;
-  const article = articles.find((a) => a.slug === slug);
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { ArrowLeft, Clock, User, Calendar, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { articles as staticArticles } from "@/lib/articles";
+
+export default function BlogPost() {
+  const { slug } = useParams();
+  const router = useRouter();
+  const [article, setArticle] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/admin/articles")
+      .then((r) => r.json())
+      .then((articles) => {
+        // Search in dynamic first, then static
+        const dynamicArticle = Array.isArray(articles) ? articles.find((a) => a.slug === slug) : null;
+        const staticArticle = staticArticles.find((a) => a.slug === slug);
+        
+        if (dynamicArticle) {
+          setArticle(dynamicArticle);
+        } else if (staticArticle) {
+          setArticle(staticArticle);
+        }
+      })
+      .catch(() => {
+        const found = staticArticles.find((a) => a.slug === slug);
+        if (found) setArticle(found);
+      })
+      .finally(() => setLoading(false));
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <div className="bg-black min-h-screen flex items-center justify-center text-white">
+        <Loader2 className="w-8 h-8 animate-spin text-[#5ce1e6]" />
+      </div>
+    );
+  }
 
   if (!article) {
-    notFound();
+    return (
+      <div className="bg-black min-h-screen flex flex-col items-center justify-center text-white px-6 text-center">
+        <h1 className="text-4xl font-bold mb-4">Post Not Found</h1>
+        <p className="text-gray-400 mb-8">The article you are looking for doesn&apos;t exist or has been moved.</p>
+        <Link href="/blog" className="bg-[#5ce1e6] text-black px-6 py-2 rounded-full font-bold">Back to Blogs</Link>
+      </div>
+    );
   }
 
   return (
@@ -52,7 +92,7 @@ export default function BlogPost({ params }) {
         <div className="prose prose-invert prose-lg max-w-none prose-p:text-gray-300 prose-headings:text-white prose-li:text-gray-300 marker:text-[#5ce1e6]">
           {article.content.map((block, index) => {
             if (block.type === "p") {
-              return <p key={index} className="leading-relaxed">{block.text}</p>;
+              return <p key={index} className="leading-relaxed mb-6">{block.text}</p>;
             }
             if (block.type === "h2") {
               return <h2 key={index} className="text-2xl md:text-3xl font-bold mt-12 mb-6">{block.text}</h2>;
@@ -60,7 +100,7 @@ export default function BlogPost({ params }) {
             if (block.type === "ul") {
               return (
                 <ul key={index} className="space-y-4 mb-8">
-                  {block.items.map((item, i) => (
+                  {(block.items || []).map((item, i) => (
                     <li key={i}>{item}</li>
                   ))}
                 </ul>

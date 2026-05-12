@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { CheckCircle2, Grip, TrendingUp, Zap, Smile, Clock, Phone } from "lucide-react";
 
@@ -114,10 +114,8 @@ function ProcessSection() {
     offset: ["start start", "end end"]
   });
 
-  // Rotate from 0 to -135 degrees (3 steps * 45 degrees)
   const rotation = useTransform(scrollYProgress, [0, 1], [0, -135]);
 
-  // Opacity maps for each description
   const opacities = [
     useTransform(scrollYProgress, [0, 0.1, 0.25], [1, 1, 0]),
     useTransform(scrollYProgress, [0.08, 0.33, 0.58], [0, 1, 0]),
@@ -125,7 +123,6 @@ function ProcessSection() {
     useTransform(scrollYProgress, [0.75, 0.9, 1], [0, 1, 1]),
   ];
 
-  // Y-translation for smooth entry/exit of text
   const yTranslations = [
     useTransform(scrollYProgress, [0, 0.25], [0, -20]),
     useTransform(scrollYProgress, [0.08, 0.33, 0.58], [20, 0, -20]),
@@ -137,26 +134,44 @@ function ProcessSection() {
     <div ref={containerRef} className="h-[400vh] w-full relative bg-black">
       <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col items-center justify-start pt-20">
 
+        {/* Starfield background */}
+        <div className="absolute inset-0 z-0 opacity-30 pointer-events-none overflow-hidden">
+          {[...Array(50)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute bg-white rounded-full animate-pulse"
+              style={{
+                width: Math.random() * 2 + 'px',
+                height: Math.random() * 2 + 'px',
+                top: Math.random() * 100 + '%',
+                left: Math.random() * 100 + '%',
+                animationDelay: Math.random() * 5 + 's',
+                animationDuration: Math.random() * 3 + 2 + 's'
+              }}
+            />
+          ))}
+        </div>
+
         {/* Header */}
         <div className="relative z-20 flex flex-col items-center">
           <div className="flex items-center space-x-2 bg-white/10 px-4 py-2 rounded-full mb-8 border border-white/10">
             <Grip className="w-4 h-4 text-white" />
             <span className="text-white text-sm font-medium">Process</span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-20 tracking-tight">Our Process</h1>
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-20 tracking-tight">Our Process</h2>
         </div>
 
-        {/* Visual Arc (Static) */}
-        <div className="absolute top-[350px] md:top-[400px] left-1/2 -translate-x-1/2 w-[2000px] md:w-[3000px] h-[2000px] md:h-[3000px] rounded-[50%] bg-gradient-to-b from-white/5 via-black to-black border-t border-white/20 -z-10" />
+        {/* Visual Arc (Refined) */}
+        <div className="absolute top-[380px] md:top-[420px] left-1/2 -translate-x-1/2 w-[1800px] md:w-[2600px] h-[1800px] md:h-[2600px] rounded-[50%] bg-gradient-to-b from-white/10 via-black to-black border-t border-white/20 -z-10 shadow-[0_-20px_50px_-20px_rgba(255,255,255,0.1)]" />
 
         {/* Rotating Planet Container */}
-        <div className="absolute top-[350px] md:top-[400px] left-1/2 -translate-x-1/2 w-[2000px] md:w-[3000px] h-[2000px] md:h-[3000px] z-10 pointer-events-none">
+        <div className="absolute top-[380px] md:top-[420px] left-1/2 -translate-x-1/2 w-[1800px] md:w-[2600px] h-[1800px] md:h-[2600px] z-10 pointer-events-none">
           <motion.div
             style={{ rotate: rotation }}
             className="w-full h-full rounded-[50%] origin-center"
           >
             {processSteps.map((step, index) => {
-              const angle = index * 45; // Place at 0, 45, 90, 135 degrees
+              const angle = index * 45;
 
               return (
                 <div
@@ -164,8 +179,8 @@ function ProcessSection() {
                   className="absolute top-0 left-0 w-full h-full origin-center"
                   style={{ transform: `rotate(${angle}deg)` }}
                 >
-                  {/* The Ball */}
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 md:w-64 md:h-64 rounded-full bg-[#5ce1e6] flex items-center justify-center text-center p-6 text-black font-extrabold text-xl md:text-2xl shadow-[0_0_60px_rgba(92,225,230,0.6)]">
+                  {/* The Ball - Re-sized to match reference */}
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 md:w-52 md:h-52 rounded-full bg-[#5ce1e6] flex items-center justify-center text-center p-6 text-black font-bold text-lg md:text-xl shadow-[0_0_80px_-10px_#5ce1e6] ring-4 ring-[#5ce1e6]/20">
                     <span className="leading-tight">{step.title}</span>
                   </div>
                 </div>
@@ -175,7 +190,7 @@ function ProcessSection() {
         </div>
 
         {/* Dynamic Descriptions */}
-        <div className="relative z-20 mt-[250px] md:mt-[300px] w-full max-w-4xl px-6 h-40">
+        <div className="relative z-20 mt-[260px] md:mt-[320px] w-full max-w-4xl px-8 h-40">
           {processSteps.map((step, index) => (
             <motion.p
               key={step.id}
@@ -183,7 +198,7 @@ function ProcessSection() {
                 opacity: opacities[index],
                 y: yTranslations[index]
               }}
-              className="absolute inset-x-6 top-0 text-center text-gray-400 text-lg md:text-xl lg:text-2xl font-medium leading-relaxed"
+              className="absolute inset-x-8 top-0 text-center text-gray-400 text-base md:text-lg lg:text-xl font-medium leading-relaxed"
             >
               {step.description}
             </motion.p>
@@ -263,6 +278,33 @@ function ExtraordinarySection() {
 }
 
 function MiniContactSection() {
+  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null); // "success" | "error"
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      if (res.ok) {
+        setSubmitStatus("success");
+        setFormData({ name: "", email: "", message: "" });
+      } else {
+        setSubmitStatus("error");
+      }
+    } catch {
+      setSubmitStatus("error");
+    } finally {
+      setSubmitting(false);
+      setTimeout(() => setSubmitStatus(null), 5000);
+    }
+  };
+
   return (
     <div className="container mx-auto px-6 pb-32 relative z-10 flex flex-col items-center">
       <div className="flex flex-col items-center mb-12">
@@ -270,29 +312,65 @@ function MiniContactSection() {
           <Phone className="w-4 h-4 text-white" />
           <span className="text-white text-sm font-medium">Contact</span>
         </div>
-
         <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tight text-center">
           Contact Us
         </h2>
       </div>
 
-      <form className="w-full max-w-2xl flex flex-col gap-6">
+      <form onSubmit={handleSubmit} className="w-full max-w-2xl flex flex-col gap-6">
         <div className="flex flex-col md:flex-row gap-6">
           <div className="flex flex-col flex-1">
             <label className="text-sm text-white font-semibold mb-2">Name</label>
-            <input type="text" placeholder="Thor" className="px-4 py-3 bg-[#f5f5f5] text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5ce1e6]" />
+            <input
+              type="text"
+              required
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              placeholder="Thor"
+              className="px-4 py-3 bg-[#f5f5f5] text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5ce1e6]"
+            />
           </div>
           <div className="flex flex-col flex-1">
             <label className="text-sm text-white font-semibold mb-2">Email</label>
-            <input type="email" placeholder="thor@gmail.com" className="px-4 py-3 bg-[#f5f5f5] text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5ce1e6]" />
+            <input
+              type="email"
+              required
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              placeholder="thor@gmail.com"
+              className="px-4 py-3 bg-[#f5f5f5] text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5ce1e6]"
+            />
           </div>
         </div>
         <div className="flex flex-col">
           <label className="text-sm text-white font-semibold mb-2">Message</label>
-          <textarea rows={5} placeholder="Your message..." className="px-4 py-3 bg-[#f5f5f5] text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5ce1e6] resize-none" />
+          <textarea
+            rows={5}
+            required
+            value={formData.message}
+            onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+            placeholder="Your message..."
+            className="px-4 py-3 bg-[#f5f5f5] text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5ce1e6] resize-none"
+          />
         </div>
-        <button type="submit" className="w-full bg-[#1a1a1a] border border-white/10 text-white font-bold text-lg py-4 rounded-xl mt-4 hover:bg-white hover:text-black transition-all duration-300">
-          Submit
+
+        {submitStatus === "success" && (
+          <div className="bg-green-500/10 border border-green-500/30 text-green-400 text-sm px-4 py-3 rounded-xl text-center">
+            ✓ Thank you! We&apos;ll get back to you within 24 hours.
+          </div>
+        )}
+        {submitStatus === "error" && (
+          <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-xl text-center">
+            Something went wrong. Please try again.
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={submitting}
+          className="w-full bg-[#1a1a1a] border border-white/10 text-white font-bold text-lg py-4 rounded-xl mt-4 hover:bg-white hover:text-black transition-all duration-300 disabled:opacity-50"
+        >
+          {submitting ? "Sending..." : "Submit"}
         </button>
       </form>
     </div>
@@ -303,9 +381,6 @@ export default function ServicesPage() {
   return (
     <div className="bg-black relative">
       <main className="relative">
-        {/* Starry Background Pattern */}
-        <div className="absolute inset-0 z-0 opacity-40 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at center, #ffffff 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-
         {/* Section 1: What We Can Do For You */}
         <div className="container mx-auto px-6 pt-40 pb-32 relative z-10 max-w-7xl">
 
@@ -329,20 +404,21 @@ export default function ServicesPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 0.6, delay: index * 0.1, ease: "easeOut" }}
-                className={`${service.span} bg-[#050505] p-8 md:p-12 rounded-[2.5rem] border border-[#5ce1e6]/30 shadow-[0_10px_40px_-15px_rgba(92,225,230,0.15)] hover:shadow-[0_10px_50px_-10px_rgba(92,225,230,0.3)] transition-all duration-300 relative overflow-hidden group`}
+                className={`${service.span} bg-[#080808] p-8 md:p-12 rounded-[2rem] border border-[#5ce1e6]/30 hover:border-[#5ce1e6]/60 transition-all duration-500 relative overflow-hidden group`}
+                style={{ borderWidth: '0.5px' }}
               >
-                {/* Subtle gradient background */}
-                <div className="absolute inset-0 bg-gradient-to-b from-[#111111] to-[#000000] z-0" />
+                {/* Noise Texture Overlay */}
+                <div className="absolute inset-0 opacity-[0.05] pointer-events-none" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3%3Cfilter id='noiseFilter'%3%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3%3C/filter%3%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3%3C/svg%3")` }} />
 
-                {/* Glow at the bottom */}
-                <div className="absolute -bottom-24 left-1/2 -translate-x-1/2 w-3/4 h-32 bg-[#5ce1e6] opacity-[0.08] blur-[45px] group-hover:opacity-[0.2] transition-opacity duration-500 z-0 pointer-events-none" />
+                {/* Atmospheric glow */}
+                <div className="absolute -bottom-24 left-1/2 -translate-x-1/2 w-full h-48 bg-[#5ce1e6] opacity-[0.06] blur-[80px] group-hover:opacity-[0.18] transition-opacity duration-700 z-0 pointer-events-none" />
 
                 <div className="relative z-10">
                   <h3 className="text-2xl md:text-3xl font-bold mb-8 text-white tracking-tight">{service.title}</h3>
                   <ul className="space-y-4">
                     {service.items.map((item, i) => (
                       <li key={i} className="flex items-center text-gray-300 group/item">
-                        <CheckCircle2 className="w-[18px] h-[18px] mr-3 text-white flex-shrink-0 group-hover/item:text-[#5ce1e6] transition-colors" />
+                        <CheckCircle2 className="w-[20px] h-[20px] mr-3 text-white flex-shrink-0 group-hover/item:text-[#5ce1e6] transition-colors" />
                         <span className="font-medium text-[15px] md:text-[16px]">{item}</span>
                       </li>
                     ))}

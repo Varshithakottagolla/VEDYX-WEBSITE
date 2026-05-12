@@ -17,6 +17,7 @@ import {
   X,
   ChevronRight,
   Wrench,
+  Grip,
 } from "lucide-react";
 
 const navItems = [
@@ -27,6 +28,7 @@ const navItems = [
   { label: "Videos", href: "/admin/dashboard/videos", icon: Video },
   { label: "Portfolio", href: "/admin/dashboard/portfolio", icon: Image },
   { label: "Blog Posts", href: "/admin/dashboard/blogs", icon: FileText },
+  { label: "Our Process", href: "/admin/dashboard/process", icon: Grip },
   { label: "Services", href: "/admin/dashboard/services", icon: Wrench },
   { label: "Inquiries", href: "/admin/dashboard/inquiries", icon: Mail },
 ];
@@ -58,9 +60,8 @@ export default function DashboardLayout({ children }) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-full w-64 bg-[#0f0f0f] border-r border-white/5 z-40 flex flex-col transition-transform duration-300 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0`}
+        className={`fixed top-0 left-0 h-full w-64 bg-[#0f0f0f] border-r border-white/5 z-40 flex flex-col transition-transform duration-300 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } md:translate-x-0`}
       >
         {/* Logo */}
         <div className="p-6 border-b border-white/5">
@@ -85,11 +86,10 @@ export default function DashboardLayout({ children }) {
                 key={item.href}
                 href={item.href}
                 onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${
-                  active
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${active
                     ? "bg-gradient-to-r from-purple-600/20 to-pink-500/10 text-white border border-purple-500/20"
                     : "text-gray-500 hover:text-white hover:bg-white/5"
-                }`}
+                  }`}
               >
                 <Icon
                   size={16}

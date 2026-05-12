@@ -1,65 +1,74 @@
 import { NextResponse } from "next/server";
-import path from "path";
+import { supabase } from "@/lib/supabase";
 import fs from "fs";
+import path from "path";
 
-const DATA_DIR = path.join(process.cwd(), "lib", "data");
+// Helper to check if Supabase is configured
+const isSupabaseConfigured = !!process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL !== 'your_supabase_url_here';
+
 const ARTICLES_PATH = path.join(process.cwd(), "lib", "articles.js");
 
-function readArticles() {
-  // Read the articles.js file and extract the array
+function readArticlesLocal() {
+  if (!fs.existsSync(ARTICLES_PATH)) return [];
   const content = fs.readFileSync(ARTICLES_PATH, "utf-8");
-  // Extract just the JSON part (the array)
   const match = content.match(/export const articles = (\[[\s\S]*\]);/);
   if (!match) return [];
   try {
-    return eval(match[1]); // Safe in server context since we control the file
+    return JSON.parse(match[1].replace(/'/g, '"').replace(/(\w+):/g, '"$1":')); // Crude conversion for eval-less parsing
   } catch {
     return [];
   }
 }
 
-function writeArticles(articles) {
-  const content = `export const articles = ${JSON.stringify(articles, null, 2)};\n`;
-  fs.writeFileSync(ARTICLES_PATH, content, "utf-8");
-}
-
 // GET /api/admin/articles
 export async function GET() {
-  const articles = readArticles();
+  if (isSupabaseConfigured) {
+    const { data, error } = await supabase
+      .from('articles')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (!error) return NextResponse.json(data);
+  }
+
+  // Fallback to local
+  const articles = readArticlesLocal();
   return NextResponse.json(articles);
 }
 
-// POST /api/admin/articles — create new article
+// POST /api/admin/articles
 export async function POST(request) {
   const body = await request.json();
-  const articles = readArticles();
 
-  const newArticle = {
-    ...body,
-    id: Date.now().toString(),
-  };
-  articles.push(newArticle);
-  writeArticles(articles);
+  if (isSupabaseConfigured) {
+    const { data, error } = await supabase
+      .from('articles')
+      .insert([body])
+      .select();
 
-  return NextResponse.json({ success: true, article: newArticle });
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ success: true, article: data[0] });
+  }
+
+  return NextResponse.json({ error: "Supabase not configured for writes" }, { status: 500 });
 }
 
-// PUT /api/admin/articles — update article by slug
+// PUT /api/admin/articles
 export async function PUT(request) {
   const body = await request.json();
   const { slug, ...updates } = body;
 
-  const articles = readArticles();
-  const index = articles.findIndex((a) => a.slug === slug);
+  if (isSupabaseConfigured) {
+    const { error } = await supabase
+      .from('articles')
+      .update(updates)
+      .eq('slug', slug);
 
-  if (index === -1) {
-    return NextResponse.json({ error: "Article not found" }, { status: 404 });
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ success: true });
   }
 
-  articles[index] = { ...articles[index], ...updates };
-  writeArticles(articles);
-
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ error: "Supabase not configured for updates" }, { status: 500 });
 }
 
 // DELETE /api/admin/articles?slug=xxx
@@ -67,9 +76,15 @@ export async function DELETE(request) {
   const { searchParams } = new URL(request.url);
   const slug = searchParams.get("slug");
 
-  const articles = readArticles();
-  const filtered = articles.filter((a) => a.slug !== slug);
-  writeArticles(filtered);
+  if (isSupabaseConfigured) {
+    const { error } = await supabase
+      .from('articles')
+      .delete()
+      .eq('slug', slug);
 
-  return NextResponse.json({ success: true });
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ success: true });
+  }
+
+  return NextResponse.json({ error: "Supabase not configured for deletes" }, { status: 500 });
 }

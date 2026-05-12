@@ -8,13 +8,18 @@ export default function PortfolioAdmin() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [addMode, setAddMode] = useState("url"); // "url" | "file"
   const [newUrl, setNewUrl] = useState("");
   const fileRef = useRef();
 
   useEffect(() => {
     fetch("/api/admin/data?section=portfolio")
       .then((r) => r.json())
-      .then(setImages);
+      .then((data) => {
+        if (Array.isArray(data)) setImages(data);
+        else setImages([]);
+      })
+      .catch(() => setImages([]));
   }, []);
 
   const save = async () => {
@@ -68,22 +73,39 @@ export default function PortfolioAdmin() {
 
       {/* Add image */}
       <div className="bg-[#111] border border-white/5 rounded-2xl p-5 mb-6">
-        <p className="text-sm font-semibold text-gray-300 mb-4">Add New Image</p>
-        <div className="flex gap-3 flex-wrap">
-          <div className="flex gap-2 flex-1 min-w-[260px]">
+        <p className="text-sm font-semibold text-gray-300 mb-4">Add New Portfolio Image</p>
+        <div className="flex gap-2 mb-4">
+          {["url", "file"].map((m) => (
+            <button
+              key={m}
+              onClick={() => setAddMode(m)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                addMode === m
+                  ? "bg-orange-500/20 text-orange-400 border border-orange-500/20"
+                  : "bg-white/5 text-gray-500 hover:text-gray-300"
+              }`}
+            >
+              {m === "url" ? "🔗 Add via URL" : "📁 Upload File"}
+            </button>
+          ))}
+        </div>
+
+        {addMode === "url" ? (
+          <div className="flex gap-2">
             <input
               value={newUrl}
               onChange={(e) => setNewUrl(e.target.value)}
-              placeholder="https://example.com/image.jpg or /images/work/img.png"
+              placeholder="Paste image URL (e.g., https://.../image.jpg)"
               className={inputClass + " flex-1"}
             />
             <button
               onClick={addByUrl}
-              className="px-4 py-2.5 bg-orange-500/20 hover:bg-orange-500/30 text-orange-400 rounded-xl text-sm font-semibold transition-all border border-orange-500/20 whitespace-nowrap"
+              className="px-4 py-2.5 bg-orange-500/20 hover:bg-orange-500/30 text-orange-400 rounded-xl text-sm font-semibold transition-all border border-orange-500/20"
             >
-              Add URL
+              Add
             </button>
           </div>
+        ) : (
           <div>
             <input
               ref={fileRef}
@@ -98,30 +120,31 @@ export default function PortfolioAdmin() {
               className="flex items-center gap-2 px-4 py-2.5 bg-white/5 hover:bg-white/10 text-gray-300 rounded-xl text-sm font-semibold transition-all border border-white/10 disabled:opacity-50"
             >
               <Upload size={14} />
-              {uploading ? "Uploading..." : "Upload File"}
+              {uploading ? "Uploading..." : "Choose Image File"}
             </button>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Image grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        {images.map((img) => (
+        {images.map((img, idx) => (
           <div
-            key={img.id}
-            className="relative group rounded-2xl overflow-hidden border border-white/5 aspect-video bg-[#111]"
+            key={img.id || idx}
+            className="relative group rounded-2xl overflow-hidden border border-white/5 aspect-video bg-[#0a0a0a]"
           >
             <img
               src={img.src}
               alt=""
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-80 group-hover:opacity-100"
             />
-            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-2">
+               <p className="text-[10px] text-white/50 truncate mb-1 px-1">{img.src}</p>
               <button
                 onClick={() => removeImage(img.id)}
-                className="p-2 bg-red-500/80 hover:bg-red-500 text-white rounded-xl transition-all"
+                className="flex items-center gap-1.5 text-[10px] text-red-400 bg-red-500/10 hover:bg-red-500/20 py-1.5 rounded-lg transition-all w-full justify-center border border-red-500/10"
               >
-                <Trash2 size={16} />
+                <Trash2 size={10} /> Remove
               </button>
             </div>
           </div>
@@ -132,12 +155,12 @@ export default function PortfolioAdmin() {
         <button
           onClick={save}
           disabled={saving}
-          className="flex items-center gap-2 bg-gradient-to-r from-orange-600 to-orange-400 text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:opacity-90 disabled:opacity-50 transition-all"
+          className="flex items-center gap-2 bg-gradient-to-r from-orange-600 to-orange-400 text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:opacity-90 disabled:opacity-50 transition-all shadow-lg shadow-orange-500/10"
         >
           {saving ? <RefreshCw size={14} className="animate-spin" /> : <Save size={14} />}
           {saving ? "Saving..." : "Save Changes"}
         </button>
-        {saved && <span className="text-green-400 text-sm font-medium">✓ Saved!</span>}
+        {saved && <span className="text-green-400 text-sm font-medium animate-in fade-in slide-in-from-left-2">✓ Saved successfully!</span>}
       </div>
     </div>
   );
