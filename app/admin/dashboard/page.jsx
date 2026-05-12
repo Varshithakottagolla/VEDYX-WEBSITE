@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Sparkles, Info, BarChart2, Video, Image,
-  FileText, Mail, Wrench, TrendingUp, ArrowRight
+  FileText, Mail, Wrench, TrendingUp, ArrowRight,
+  RefreshCw, Cloud
 } from "lucide-react";
 
 const sections = [
@@ -21,8 +22,10 @@ const sections = [
 
 export default function DashboardOverview() {
   const [counts, setCounts] = useState({ blogs: 0, inquiries: 0, videos: 0 });
+  const [syncing, setSyncing] = useState(false);
+  const [syncStatus, setSyncStatus] = useState(null);
 
-  useEffect(() => {
+  const fetchData = () => {
     Promise.all([
       fetch("/api/admin/articles").then((r) => r.json()).catch(() => []),
       fetch("/api/admin/data?section=videos").then((r) => r.json()).catch(() => []),
@@ -34,16 +37,52 @@ export default function DashboardOverview() {
         inquiries: Array.isArray(contacts) ? contacts.filter((c) => !c.read).length : 0,
       });
     });
+  };
+
+  useEffect(() => {
+    fetchData();
   }, []);
+
+  const handleSync = async () => {
+    if (!confirm("This will migrate your local articles and social links to the cloud (Supabase). Continue?")) return;
+    
+    setSyncing(true);
+    try {
+      const res = await fetch("/api/admin/sync", { method: "POST" });
+      if (res.ok) {
+        setSyncStatus("success");
+        fetchData();
+      } else {
+        setSyncStatus("error");
+      }
+    } catch {
+      setSyncStatus("error");
+    }
+    setSyncing(false);
+    setTimeout(() => setSyncStatus(null), 3000);
+  };
 
   return (
     <div>
       {/* Header */}
-      <div className="mb-10">
-        <h1 className="text-3xl font-bold text-white tracking-tight">Dashboard</h1>
-        <p className="text-gray-500 mt-1 text-sm">
-          Manage all Vedyx website content from here.
-        </p>
+      <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-white tracking-tight">Dashboard</h1>
+          <p className="text-gray-500 mt-1 text-sm">
+            Manage all Vedyx website content from here.
+          </p>
+        </div>
+        
+        {/* Sync Button */}
+        <button
+          onClick={handleSync}
+          disabled={syncing}
+          className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-xl text-sm font-medium transition-all group"
+        >
+          <RefreshCw size={16} className={`text-blue-400 ${syncing ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
+          {syncing ? 'Syncing to Cloud...' : 'Sync to Cloud'}
+          {syncStatus === 'success' && <span className="text-green-400 ml-2">✓ Done</span>}
+        </button>
       </div>
 
       {/* Quick stats */}
@@ -100,7 +139,10 @@ export default function DashboardOverview() {
 
       {/* Quick links */}
       <div className="mt-10 bg-[#111] border border-white/5 rounded-2xl p-5">
-        <p className="text-sm font-semibold text-gray-400 mb-3">Quick Links</p>
+        <p className="text-sm font-semibold text-gray-400 mb-3 flex items-center gap-2">
+          <Cloud size={14} className="text-blue-400" />
+          Quick Links
+        </p>
         <div className="flex flex-wrap gap-3">
           <a href="/" target="_blank" rel="noreferrer" className="text-xs bg-white/5 hover:bg-white/10 text-gray-300 px-3 py-1.5 rounded-lg transition-colors">
             View Live Site →
