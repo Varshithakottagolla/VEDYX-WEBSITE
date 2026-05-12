@@ -15,7 +15,8 @@ const sections = [
   { label: "Portfolio", desc: "Add/remove portfolio images", href: "/admin/dashboard/portfolio", icon: Image, color: "from-orange-500/20 to-orange-500/5", border: "border-orange-500/20" },
   { label: "Blog Posts", desc: "Create, edit or delete articles", href: "/admin/dashboard/blogs", icon: FileText, color: "from-green-500/20 to-green-500/5", border: "border-green-500/20" },
   { label: "Services", desc: "Edit service offerings", href: "/admin/dashboard/services", icon: Wrench, color: "from-yellow-500/20 to-yellow-500/5", border: "border-yellow-500/20" },
-  { label: "Inquiries", desc: "View contact form submissions", href: "/admin/dashboard/inquiries", icon: Mail, color: "from-pink-500/20 to-pink-500/5", border: "border-pink-500/20" },
+  { label: "Social Links", desc: "Manage footer social URLs", href: "/admin/dashboard/social-links", icon: TrendingUp, color: "from-pink-500/20 to-pink-500/5", border: "border-pink-500/20" },
+  { label: "Inquiries", desc: "View contact form submissions", href: "/admin/dashboard/inquiries", icon: Mail, color: "from-indigo-500/20 to-indigo-500/5", border: "border-indigo-500/20" },
 ];
 
 export default function DashboardOverview() {

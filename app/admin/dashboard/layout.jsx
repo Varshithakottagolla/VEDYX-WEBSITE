@@ -16,8 +16,8 @@ import {
   Menu,
   X,
   ChevronRight,
-  Wrench,
   Grip,
+  Share2,
 } from "lucide-react";
 
 const navItems = [
@@ -30,6 +30,7 @@ const navItems = [
   { label: "Blog Posts", href: "/admin/dashboard/blogs", icon: FileText },
   { label: "Our Process", href: "/admin/dashboard/process", icon: Grip },
   { label: "Services", href: "/admin/dashboard/services", icon: Wrench },
+  { label: "Social Links", href: "/admin/dashboard/social-links", icon: Share2 },
   { label: "Inquiries", href: "/admin/dashboard/inquiries", icon: Mail },
 ];
 
